@@ -10,7 +10,9 @@
   "scripts": {
     "clean": "rimraf build",
     "prebuild": "npm run clean",
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node ./build/index.js",
+    "dev": "npm run build && npm start"
   },
   "files": [
     "build"
@@ -27,13 +29,20 @@
   },
   "homepage": "https://github.com/civil3d-mcp/civil3d-mcp#readme",
   "dependencies": {
+    "@google-cloud/vertexai": "^1.10.0",
     "@modelcontextprotocol/sdk": "^1.7.0",
-    "ws": "^8.18.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "uuid": "^13.0.0",
+    "ws": "^8.18.3",
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@types/node": "^22.13.10",
-    "@types/ws": "^8.18.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.19.2",
+    "@types/ws": "^8.18.1",
     "rimraf": "^5.0.10",
     "typescript": "^5.8.2"
   }
