@@ -39,6 +39,7 @@ interface ClientSession {
   id: string;
   ws: WebSocket;
   conversationHistory: Array<{ role: "user" | "assistant"; content: string }>;
+  pendingResults: Map<string, { resolve: (value: any) => void; timeout: NodeJS.Timeout }>;
 }
 
 const activeSessions = new Map<string, ClientSession>();
@@ -108,6 +109,7 @@ wss.on("connection", (ws: WebSocket) => {
     id: sessionId,
     ws,
     conversationHistory: [],
+    pendingResults: new Map(),
   };
 
   activeSessions.set(sessionId, session);
@@ -133,10 +135,16 @@ wss.on("connection", (ws: WebSocket) => {
       } else if (data.type === "result") {
         // Client responds with tool execution result
         const toolResult = data.data;
-        console.log(`[Session ${sessionId}] Received tool result: ${JSON.stringify(toolResult)}`);
+        const requestId = data.requestId;
+        console.log(`[Session ${sessionId}] Received tool result for request ${requestId}`);
 
-        // This result will be processed in the tool calling loop
-        // For now, just log it
+        // Check if we have a pending result handler
+        if (requestId && session.pendingResults.has(requestId)) {
+          const pending = session.pendingResults.get(requestId)!;
+          clearTimeout(pending.timeout);
+          session.pendingResults.delete(requestId);
+          pending.resolve(toolResult);
+        }
       }
     } catch (error) {
       console.error(`[Session ${sessionId}] Error processing message:`, error);
@@ -292,25 +300,15 @@ function waitForToolResult(session: ClientSession, requestId: string): Promise<a
   return new Promise((resolve) => {
     const timeout = setTimeout(() => {
       console.warn(`[Session ${session.id}] Tool result timeout for request ${requestId}`);
+      session.pendingResults.delete(requestId);
       resolve({ error: "Tool execution timeout" });
     }, 30000); // 30 second timeout
 
-    // Listen for result message
-    const originalOnMessage = session.ws.onmessage;
-    const handler = (event: any) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.type === "result" && data.requestId === requestId) {
-          clearTimeout(timeout);
-          session.ws.onmessage = originalOnMessage;
-          resolve(data.data);
-        }
-      } catch (error) {
-        // Ignore parsing errors, continue listening
-      }
-    };
-
-    session.ws.onmessage = handler;
+    // Register this request ID in pending results
+    session.pendingResults.set(requestId, {
+      resolve,
+      timeout,
+    });
   });
 }
 
