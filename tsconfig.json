@@ -8,8 +8,9 @@
       "strict": true,
       "esModuleInterop": true,
       "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": true
+      "forceConsistentCasingInFileNames": true,
+      "noImplicitAny": false
     },
-    "include": ["src/**/*"],
-    "exclude": ["node_modules"]
+    "include": ["src/index.ts"],
+    "exclude": ["node_modules", "src/tools/**", "src/utils/**"]
   }

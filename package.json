@@ -1,6 +1,6 @@
 {
   "name": "civil3d-mcp",
-  "version": "1.0.0",
+  "version": "0.1.0-alpha",
   "description": "MCP server for interacting with Autodesk Civil 3D.",
   "main": "index.js",
   "type": "module",
