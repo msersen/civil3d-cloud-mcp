@@ -5,6 +5,11 @@ import { registerGetSelectedCivilObjectsInfoTool } from "./get_selected_civil_ob
 import { registerCreateCogoPointTool } from "./create_cogo_point.js";
 import { registerCreateLineSegmentTool } from "./create_line_segment.js";
 
+// Point Management Tools (Point Editor Integration)
+import { registerGetCogoPointsTool } from "./get_cogo_points.js";
+import { registerSyncPointsBatchTool } from "./sync_points_batch.js";
+import { registerDeleteCogoPointsTool } from "./delete_cogo_points.js";
+
 // Layer Management Tools (CAD Manager Integration)
 import { registerCreateLayerTool } from "./create_layer.js";
 import { registerListLayersTool } from "./list_layers.js";
@@ -22,6 +27,11 @@ export async function registerTools(server: McpServer) {
   registerGetSelectedCivilObjectsInfoTool(server);
   registerCreateCogoPointTool(server);
   registerCreateLineSegmentTool(server);
+  
+  // Point Management Tools (Point Editor Integration)
+  registerGetCogoPointsTool(server);
+  registerSyncPointsBatchTool(server);
+  registerDeleteCogoPointsTool(server);
   
   // Layer Management Tools
   registerCreateLayerTool(server);
